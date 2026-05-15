@@ -8,6 +8,11 @@ body {
 }
 
 article {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* optional */
+
   background-color: rgba(211, 211, 211, 0.9);
   border-radius: 16px;
   padding: 16px;
@@ -41,4 +46,21 @@ span {
   border-radius: 6px;
   background-color: darkgray;
   font-weight: bold;
+}
+
+.rating {
+  font-weight: bold;
+  margin-top: auto;
+}
+
+.rating-high {
+  color: #17813b;
+}
+
+.rating-medium {
+  color: #ba7108;
+}
+
+.rating-low {
+  color: #ef4444;
 }

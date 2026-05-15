@@ -137,6 +137,31 @@ function searchMovies(query) {
       // include an "Add" button for each result that calls `addMovie(imdbID)` when clicked.
       // There is a second part to this task, in `addMovie`
 
+      if (results.length === 0) {                                                       // A D D   M O V I E
+        new ElementBuilder("p")
+            .text(messages.noResultsFound)
+            .appendTo(resultsDiv);
+        return;
+      }
+
+      for (const movie of results) {
+        const resultElement = new ElementBuilder("div")
+            .class("search-result")
+            .append(new ElementBuilder("span").text(`${movie.Title} (${movie.Year})`))
+            .append(
+                new ButtonBuilder("Add").onclick(() => {
+                  addMovie(movie.imdbID);
+                  const div = document.getElementById("search-" + movie.imdbID);
+                  if (div) {
+                    div.remove();
+                  }
+                })
+            )
+            .appendTo(resultsDiv);
+
+        resultElement.id = "search-" + movie.imdbID;
+      }
+
     })
     .catch(error => {
       console.error('Search failed:', error);
@@ -168,6 +193,17 @@ window.onload = function () {
       // Task 1.2: Render a user greeting to `#userGreeting` 
       // using `firstName`, `lastName`, and the server-provided
       // login timestamp.
+
+      const loginDate = new Date(currentSession.loginTime);                     // *** G R E E T I N G ***
+
+      greetingElement.textContent =
+          `Hi ${currentSession.firstName} ${currentSession.lastName}, ` +
+          `du hast dich am ${loginDate.toLocaleDateString("de-AT")} ` +
+          `um ${loginDate.toLocaleTimeString("de-AT", {
+            hour: "2-digit",
+            minute: "2-digit"
+          })} angemeldet.`;
+
     } else {
       greetingElement.textContent = messages.loggedOutGreeting;
     }
@@ -215,6 +251,33 @@ window.onload = function () {
     // Task 1.1: Implement the login submit flow to call `POST /login` 
     // with username and password, handle errors, save the response 
     // into `currentSession`, then call `updateUI()` and `loadMovies()`.
+
+    fetch("/login", {                                               // *** L O G I N ***
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: formData.get("username"),
+        password: formData.get("password")
+      })
+    })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          currentSession = data;
+          document.getElementById("loginDialog").close();
+          updateUI();
+          loadMovies();
+        })
+        .catch(error => {
+          console.error("Login failed:", error);
+          alert(messages.loginFailed);
+        });
 
   });
 
